@@ -19,7 +19,8 @@ consumer_thread = Thread(target=consume_tasks, args=(task_queue,))
 consumer_thread.start()
 
 # 영상 파일 로드
-youtube_url = "https://www.youtube.com/watch?v=E1_yVUhqSLw"
+youtube_url = "https://www.youtube.com/shorts/LdeM2mNXYHo"
+# youtube_url = "https://www.youtube.com/watch?v=DfnMZDL6aVU"
 
 ydl_opts = {
     "format": "bestvideo",
@@ -45,7 +46,7 @@ def enqueue_task(queue, file_name, rider_crop, plate_crop, rider_box, plate_box)
     task_data = (file_name, rider_crop, plate_crop, rider_box, plate_box)
     queue.put(task_data)
 
-frame_skip = 3
+frame_skip = 1
 frame_count = 0
 
 # 타이밍 측정을 위한 변수
@@ -78,6 +79,9 @@ while cap.isOpened():
                             np_x1, np_y1, np_x2, np_y2 = map(int, plate_box.xyxy[0])
                             np_cls = int(plate_box.cls[0].item())
                             if np_cls == 3 and rx1 <= np_x1 <= rx2 and ry1 <= np_y1 <= ry2:
+                                # cv2.rectangle(frame, (rx1, ry1), (rx2, ry2), (255, 0, 0), 2)
+                                # cv2.rectangle(frame, (np_x1, np_y1), (np_x2, np_y2), (0, 255, 0), 2)
+                                # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
                                 # 스크린샷 저장
                                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
                                 file_name = f"{capture_path}screenshot_{timestamp}.png"
@@ -99,7 +103,7 @@ while cap.isOpened():
 
     # 프레임을 화면에 출력
     cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
-    # cv2.imshow("Frame", frame)
+    cv2.imshow("Frame", frame)
 
     # 'q' 키를 눌러서 종료
     if cv2.waitKey(1) & 0xFF == ord("q"):
